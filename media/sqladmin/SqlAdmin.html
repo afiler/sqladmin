@@ -1,0 +1,71 @@
+<div style="width:100%; height: 100%">
+  <div dojoAttachPoint="containerNode" dojotype="dijit.layout.BorderContainer" style="width:100%; height: 100%">
+    <div dojoattachpoint="x2" dojotype="dijit.layout.ContentPane" title="Databases" region="left" style="height: 100%; width: 200px" splitter="true">
+      <div dojoattachpoint="treeNode"></div>
+    </div>
+      <div dojoattachpoint="tabs" dojotype="dijit.layout.TabContainer" region="center" style="height: 100%">
+        <div dojoType="dijit.layout.BorderContainer" title="SQL" class="full" dojoAttachPoint="sqlTab">
+          <div dojoType="dijit.layout.ContentPane" region="top" style="margin: 0px; padding: 0px;">
+            <div id="sqlEditorToolbar" dojoType="dijit.Toolbar">
+              <div dojoType="dijit.form.Button" id="sqlEditorToolbar.cut" iconClass="dijitEditorIcon dijitEditorIconCut" showLabel="false">
+                  Cut
+              </div>
+              <div dojoType="dijit.form.Button" id="sqlEditorToolbar.copy" iconClass="dijitEditorIcon dijitEditorIconCopy" showLabel="false">
+                  Copy
+              </div>
+              <div dojoType="dijit.form.Button" id="sqlEditorToolbar.paste" iconClass="dijitEditorIcon dijitEditorIconPaste" showLabel="false">
+                  Paste
+              </div>
+              <span dojoType="dijit.ToolbarSeparator"></span>
+              <button dojoType="dijit.form.Button" type="button" dojoAttachPoint="runButton" iconClass="runIcon">
+                <img src="/media/img/runIcon.png" />
+                Run
+              </button>
+            </div>
+          </div>
+          <div dojoType="dijit.layout.ContentPane" region="center" style="margin: 0px; padding: 0px;">
+            <textarea dojoAttachPoint="sqlTextArea" spellcheck="false" style="margin: 0px; padding:0px;"></textarea>
+          </div>
+            <table dojoType="dojox.grid.DataGrid"  region="bottom" splitter="true"  style="height: 300px; margin: 0px; padding: 0px;" dojoAttachPoint="rawQueryGrid" clientSort="true" rowSelector="20px">
+              <thead>
+                <tr>
+                  <th width="50px" field="id"></th>
+                </tr>
+              </thead>
+            </table>
+        </div>
+        <div dojoType="dijit.layout.ContentPane" title="Database" class="full" dojoAttachPoint="databaseTab">
+          <button>New Table</button>
+        </div>
+        <div dojoType="dijit.layout.ContentPane" title="New Table" display="Hidden" class="full" dojoAttachPoint="newTableTab">
+          <h2>Table</h2>
+          <label for="name">Name</label>
+          <input type="text" name="name" />
+          <h2>Columns</h2>
+          <div dojoAttachPoint="newTableGrid" rowSelector="20px" class="full" ></div>
+        </div>
+        <div title="Data" dojotype="dijit.layout.ContentPane" style="height: 100%" dojoattachpoint="dataTab">
+          <table dojoType="dojox.grid.DataGrid"  region="bottom" splitter="true"  style="height: 300px; margin: 0px; padding: 0px;" dojoAttachPoint="dataGrid" clientSort="false" rowSelector="20px">
+              <thead>
+                <tr>
+                  <th width="50px" field="id"></th>
+                </tr>
+              </thead>
+          </table>
+        </div>
+        <div title="Structure" dojotype="dijit.layout.ContentPane" style="height: 100%" dojoattachpoint="structureTab">
+          <table dojoType="dojox.grid.DataGrid"  region="bottom" splitter="true"  style="height: 300px; margin: 0px; padding: 0px;" dojoAttachPoint="structureGrid" clientSort="true" rowSelector="20px">
+              <thead>
+                <tr>
+                  <th field="name" width="20em">Column</th>
+                  <th field="data_type" width="15em">Type</th>
+                  <th field="data_length" width="10em">Length</th>
+                  <th field="default" width="20em">Default</th>
+                  <th field="is_nullable" width="5em">Nullable</th>
+                </tr>
+              </thead>
+          </table>
+        </div>
+      </div>
+  </div>
+</div>
