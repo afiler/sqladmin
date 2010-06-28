@@ -54,7 +54,9 @@
           </table>
         </div>
         <div title="Structure" dojotype="dijit.layout.ContentPane" style="height: 100%" dojoattachpoint="structureTab">
-          <table dojoType="dojox.grid.DataGrid"  region="bottom" splitter="true"  style="height: 300px; margin: 0px; padding: 0px;" dojoAttachPoint="structureGrid" clientSort="true" rowSelector="20px">
+          <table dojoType="dojox.grid.DataGrid"  region="bottom" splitter="true"  style="height: 300px; margin: 0px; padding: 0px;"
+	    dojoAttachPoint="structureGrid" clientSort="true"
+  rowSelector="20px" loadingMessage="loading">
               <thead>
                 <tr>
                   <th field="name" width="20em">Column</th>

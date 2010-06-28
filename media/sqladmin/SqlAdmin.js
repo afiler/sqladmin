@@ -79,9 +79,11 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
     }, dojo.create('div'));
     this.tree.placeAt(this.treeNode, 'only');
     this.loadEditor();
-    this.loadDatabase();
+    this.loadDbView();
 
     dojo.connect(this.runButton, "onClick", this, this.runQuery);
+    dojo.connect(this.dataGrid, "onApplyCellEdit", this, this.applyDataGridCellEdit);
+    dojo.connect(this.structureGrid, "onApplyCellEdit", this, this.applyStructureGridCellEdit);
   },
 
   editorOptions: {
@@ -126,8 +128,8 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
       jsonp: "callback",
       content: { q: query },
       load: function(result, request) {
-          console.log("Got response to query: "+request.args.content.q);
-          console.log(result);
+          debug("Got response to query: "+request.args.content.q);
+          debug(result);
           structure = dojo.map(result.columns, function(field)
             { return {field: field[0], name: field[0], width: Math.min(Number(field[2]),self.maxColWidth)+'em'}});
           self.rawQueryGrid.setStructure(structure);
@@ -151,9 +153,12 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
     self=this;
     self.hideTabs();
     dojo.forEach(arguments, function(tab) {
-      self.tabs.addChild(tab, 1);
+      self.tabs.addChild(tab, 0);
     });
-    //self.loadEditor();
+  },
+
+  selectTab: function(t) {
+    self.tabs.selectChild(t);
   },
 
   getIconClass: function(item, opened){
@@ -176,8 +181,10 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
       this.tableStore.fetch({query: {table_id: id}, onError: error,
         onComplete: dojo.hitch(this, this.loadTable)});
         //dojo.hitch(this, function(table) { this.loadTable(table, id)});
+      //this.loadTableView(id);
+      this.selectTab(this.structureTab);
     } else if (type=='database') {
-      this.loadDatabase(id);
+      this.loadDbView(id);
     }
   },
 
@@ -189,18 +196,32 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
 
   getTableDataStore: function(table_id, pk) {
     debug('getTableDataStore('+table_id+','+pk+')');
-    return this.tableDataStores[table_id] = this.tableDataStores[table_id] || new dojox.data.JsonRestStore({target:table_id, idAttribute:pk})
+    return this.tableDataStores[table_id] = this.tableDataStores[table_id] || new dojox.data.JsonRestStore({target:table_id, idAttribute:pk});
   },
 
-  loadDatabase: function() {
-      this.showTabs(self.databaseTab);
+  loadDbView: function(id) {
+    if (this.view != 'database') {
+      this.showTabs(this.databaseTab);
+      this.view = 'database';
+    }
+    this.selectTab(this.databaseTab);
+  },
+
+  loadTableView: function(id) {
+    if (this.view != 'table') {
+      this.showTabs(this.structureTab, this.dataTab);
+      this.view = 'table';
+    }
+    this.selectTab(this.structureTab);
+    this.tableStore.fetch({query: {table_id: id}, onError: error,
+      onComplete: dojo.hitch(this, this.loadTable)});
   },
 
   loadTable: function(table) {
     debug('loadTable');
     self = this;
     structure = dojo.map(table.columns, function(field) {
-        return {field: field.name, name: field.name, width: self.getColWidth(field)}
+        return {field: field.name, name: field.name, width: self.getColWidth(field), editable: true}
       });
     this.dataGrid.setStore(this.getTableDataStore(table.table_id, table.pk));
     this.dataGrid.setStructure(structure);
@@ -211,6 +232,20 @@ dojo.declare('sqladmin.SqlAdmin', sqladmin.TemplatedWidget, {
     this.structureGrid.setStore(new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: table.columns}}));
   //}
   //}});
+  },
+
+  applyDataGridCellEdit: function(val, row, col ) {
+    console.log('applyDataGridCellEdit('+val+', '+row+','+col+')');
+    this.dataGrid.updateRow(row);
+    console.log('applyDataGridCellEdit('+val+', '+row+','+col+') -- update done');
+  },
+
+  applyStructureGridCellEdit: function(val, row, col ) {
+    console.log('applyDataGridCellEdit('+val+', '+row+','+col+')');
+    this.structureGrid.updateRow(row);
+  },
+
+  applyEdit: function(store, val, row, col) {
   },
 });
 
