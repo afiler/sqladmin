@@ -1,15 +1,20 @@
-import csv, re, json
+import csv
+import datetime
+import json
+import re
+
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
-from django.template import RequestContext
-from django.conf import settings
-from imp5.sqladmin import dbx
 import django.db.models.fields
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
 from dojango.decorators import json_response, __prepare_json_ret
 from dojango.util import json_encode
-import datetime
+
+from imp5.sqladmin import dbx
 
 TABLE_NAME_SEPARATOR='/'
 
