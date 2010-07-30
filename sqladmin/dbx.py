@@ -22,7 +22,10 @@ class QueryError(Exception):
 
 class Conn(object):
     def __init__(self, conn=None):
-        self.dbconn=conn or django.db.connection
+        if conn is not None:
+            self.dbconn = conn
+        else:
+            self.dbconn = django.db.connection
 
         self._dbs = None
 
@@ -44,7 +47,8 @@ class Conn(object):
 
     def fetch(self, q, args=[], hash=False, fetch_one=False, db=None, return_columns=False, **kw):
         c = self.dbconn.connection.cursor()
-        #if db: c.execute(('use %s'%self.quote_db(db)).encode('utf-8'))
+        #if db:
+        #    c.execute(('use %s' % self.quote_db(db)).encode('utf-8'))
         args = [x.encode('utf-8') for x in args]
         #print repr(q % args)
         #print repr(args)
@@ -84,7 +88,8 @@ class Conn(object):
 
     @property
     def dbs(self):
-        if self._dbs != None: return self._dbs
+        if self._dbs is not None:
+            return self._dbs
 
         q = self.fetch('select name from master..sysdatabases order by name')
         self._dbs = [self.db(x[0]) for x in q]
@@ -128,7 +133,9 @@ class DB(object):
 
     @property
     def tables(self):
-        if self._tables != None: return self._tables
+        if self._tables is not None:
+            return self._tables
+
         try:
             q = self.fetch("select name from %s..sysobjects where xtype='U' order by name" % \
                     self.quoted_name)
@@ -139,7 +146,9 @@ class DB(object):
 
     @property
     def views(self):
-        if self._tables != None: return self._tables
+        if self._tables is not None:
+            return self._tables
+
         try:
             q = self.fetch("select name from %s..sysobjects where xtype='V' order by name" % \
                     self.quoted_name)
@@ -150,7 +159,9 @@ class DB(object):
 
     @property
     def tables_and_views(self):
-        if self._tables != None: return self._tables
+        if self._tables is not None:
+            return self._tables
+
         try:
             # Get PKs
             pks = {}
@@ -172,7 +183,8 @@ class DB(object):
 class Table(object):
     def __init__(self, db, table, subtype='U', pk=None):
         self.table_name = table
-        if type(db) in (str, unicode): db = DB(db)
+        if isinstance(db, basestring):
+            db = DB(db)
         self.db = db
         self.db_name = db.db_name
         self.conn = db.conn
@@ -208,7 +220,8 @@ class Table(object):
 
     @property
     def pk(self):
-        if self._pk != None: return self._pk
+        if self._pk is not None:
+            return self._pk
 
         # XXX!
         try:
@@ -229,7 +242,8 @@ class Table(object):
 
     @property
     def columns(self):
-        if self._columns != None: return self._columns
+        if self._columns is not None:
+            return self._columns
 
         q = """select
                 column_name as name,

@@ -58,7 +58,8 @@ def database_tree(request):
 @json_response
 def tables(request, db=None, table=None, table_id=None):
     table_id = table_id or request.REQUEST.get('table_id', None)
-    if not table_id: return HttpResponseBadRequest()
+    if not table_id:
+        return HttpResponseBadRequest()
     db_name, table_name = table_id.split(TABLE_NAME_SEPARATOR)
     table = dbx.Table(db=db_name, table=table_name)
     return {
@@ -208,7 +209,9 @@ def index(request):
     user = request.user
     field_types = []
     for name, field in django.db.models.fields.__dict__.iteritems():
-        if not (issubclass(type(field), type) and issubclass(field, django.db.models.fields.Field)): continue
+        if not (issubclass(type(field), type) and \
+           issubclass(field, django.db.models.fields.Field)):
+            continue
         name = re.sub('([a-z])([A-Z])', r'\1 \2', re.sub('Field$', '', name))
         if name and field:
             # XXX: This should use a connection object to get the right db type
