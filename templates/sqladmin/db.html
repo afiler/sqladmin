@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/index.css" />{% endblock %}
+{% block content %}
+  <div id="content-main">
+    <table id="homelayoutgrid">
+      <tr>
+        <td class="homelayoutgridbox">
+          <div class="module">
+            <table summary="Tables section" width="100%">
+              <caption>Tables</caption>
+              <th>Table</th>
+              {% for table in db.tables %}
+                <tr>
+                  <td>{{ table.name }}</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+{% endblock %}

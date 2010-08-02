@@ -1,0 +1,128 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+  @import "/media/dojo/dojox/grid/resources/Grid.css";
+  @import "/media/dojo/dojox/grid/resources/tundraGrid.css";
+
+  #main {
+    width: 100%;
+    height: 100%;
+    top: 20;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+  }
+  html, body, #content-main, #content, #container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div id="container">
+
+    <script type="text/javascript">
+    dojo.require("dojox.grid.DataGrid");
+    dojo.require("dojox.data.CsvStore");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dijit.Tree");
+    dojo.require("dijit.tree.TreeStoreModel");
+    //dojo.require("dojox.data.JsonRestStore");
+
+    dojo.addOnLoad(function(){
+      var dbStore = new dojo.data.ItemFileReadStore({url: '/sqladmin/databases.json'});
+      var dbModel = new dijit.tree.TreeStoreModel({store: dbStore, query: {id: '*'}})
+      var dbTree = new dijit.Tree({id:"dbTree", model: dbModel, showRoot:false, style:"height: 100%"});
+      dojo.byId("databases").appendChild(dbTree.domNode);
+
+      var tableStore = new dojox.data.CsvStore({url: "/sqladmin/{{db_name}}/{{table_name}}.csv"});
+
+      var layout = [
+          {% for col in table.columns %}
+            { field: '{{col.name}}', name: '{{col.name}}',
+            {% ifequal col.type 'varchar' %}
+              width: '{{col.length}}em',
+            {% else %}
+              width: '10em',
+            {% endifequal %}
+            },
+          {% endfor %}
+      ];
+
+      var grid = new dojox.grid.DataGrid({
+          store: tableStore,
+          clientSort: true,
+          rowSelector: '20px',
+          structure: layout,
+          class: 'tundra',
+          style: 'width: 100%; height: 100%;'
+      }, document.createElement('div'));
+
+      dojo.byId("data").appendChild(grid.domNode);
+      grid.startup();
+    });
+</script>
+
+<div id="content-main">
+  <div dojoType="dijit.layout.BorderContainer" id="main">
+    <div dojoType="dijit.layout.ContentPane" id="databases" title="Databases" region="left" style="height: 100%; width: 200px" splitter="true">
+    </div>
+    <div dojoType="dijit.layout.TabContainer" id="tabs" region="center" style="height: 100%" >
+      <div  dojoType="dijit.layout.ContentPane" id="data" style="height: 100%" title="Data"></div>
+      <div  dojoType="dijit.layout.ContentPane" id="structure" style="height: 100%" title="Structure">
+        <table width="100%">
+          <caption>Columns</caption>
+          <tr>
+             <th>Column</th>
+             <th>Type</th>
+             <th>Default</th>
+             <th>Nullable</th>
+          </tr>
+          {% for col in table.columns %}
+            <tr>
+              <td>{{ col.name }}</td>
+              <td>{{ col.type }}
+                 ({{ col.length }}
+                 {{ col.numeric_precision_radix|default:"" }}
+                 {{ col.numeric_scale|default:"" }})
+              </td>
+              <td>{{ col.column_default|default:"" }}</td>
+              <td>{% ifequal col.is_nullable "YES" %}X{% endifequal %}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+      {% comment %}
+
+            <table summary="Tables section" width="100%">
+              <caption>Columns</caption>
+              <tr>
+              {% for col in table.columns %}
+                 <th>{{ col.name }}</th>
+              {% endfor %}
+              </tr>
+              {% for row in data %}
+                <tr>
+                  {% for col in row %}
+                    <td>{{ col }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </table>
+      {% endcomment %}
+
+
+
+  </div>
+
+
+
+{% endblock %}
